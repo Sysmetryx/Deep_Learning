@@ -12,14 +12,14 @@ def main():
     for line in lines:
         line = line.strip().lower() # Remove blanks and capitals
         if("Charles Baudelaire avait un ami".lower()
-           in line and bStart==False):
+           in line and bStart == False):
             print("START")
             bStart = True
         if("End of the Project Gutenberg EBook of Les Fleurs du Mal, "
            "by Charles Baudelaire".lower() in line):
             print("END")
             break
-        if(bStart==False or len(line) == 0):
+        if bStart == False or len(line) == 0:
             continue
         lines2.append(line)
     fin.close()
@@ -43,7 +43,6 @@ def main():
     # used for decoding, i.e. generation - part c)
     index2char = dict((i, c) for i, c in
                       enumerate(chars))  # mapping index -> char in dictionary
-
     X = np.zeros((len(input_chars), SEQLEN, nb_chars), dtype=np.bool)
     y = np.zeros((len(input_chars), nb_chars), dtype=np.bool)
     # print(input_chars)
@@ -67,7 +66,6 @@ def main():
     outfile = "Baudelaire_len_" + str(SEQLEN) + ".p"
     with open(outfile, "wb") as pickle_f:
         pickle.dump([index2char, X_train, y_train, X_test, y_test], pickle_f)
-
 
 
 if __name__ == '__main__':

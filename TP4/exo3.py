@@ -6,7 +6,7 @@ from sklearn.manifold import TSNE
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-mpl.use('TKAgg')
+
 
 def part1():
     # Part One :
@@ -51,6 +51,7 @@ def part1():
     with open(outfile, "wb") as pickle_f:
         pickle.dump([listwords, embeddings], pickle_f)
 
+
 def part2():
     # Part Two :
     outfile = 'Caption_Embeddings.p'
@@ -90,31 +91,11 @@ def part2():
     plt.colorbar(ticks=range(10))
     plt.show()
 
+
 def main():
     part1()
     part2()
 
+
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

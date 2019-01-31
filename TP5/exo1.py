@@ -8,7 +8,7 @@ def main():
     # Train dataset path
     filename = 'flickr_8k_train_dataset.txt'
     # Loading data
-    df = pd.read_csv(filename, delimiter='\t')
+    df = pd.read_csv(filename, delimiter='\t', encoding='utf8')
     # Getting sample number
     nb_samples = df.shape[0]
     iter = df.iterrows()

@@ -42,6 +42,10 @@ def embedd(dataset):
         if (l > maxLCap):
             maxLCap = l
     print("max caption length =" + str(maxLCap))
+    # Because train maxLcap is greater than test's.
+    if dataset == 'test' :
+        maxLCap = 39
+        print("max caption length corrected =" + str(maxLCap))
     nbkeep = 1000
     outfile = "Caption_Embeddings_" + str(nbkeep) + ".p"
     # Loading reduced dictionary
@@ -78,6 +82,7 @@ def embedd(dataset):
 
 def main():
     embedd('train')
+    embedd('test')
 
 
 if __name__ == '__main__':

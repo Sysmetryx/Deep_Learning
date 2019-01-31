@@ -44,5 +44,6 @@ def main():
     model.metrics_names[1], scores_test[1] * 100))
     saveModel(model, "testmodel")
 
+
 if __name__ == '__main__':
     main()

@@ -10,13 +10,10 @@ from sklearn.mixture import GaussianMixture
 from scipy import linalg
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE
-from keras.utils import np_utils
 from keras.datasets import mnist
 from sklearn.decomposition import PCA
 
-
 def loader():
-    # the data, shuffled and split between train and test sets
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
     X_train = X_train.reshape(60000, 784)
     X_test = X_test.reshape(10000, 784)
@@ -122,23 +119,21 @@ def visualization(points2D, labels, convex_hulls, ellipses, projname, nh):
 
 
 def main():
-    x_train, y_train, x_test, y_test = loader()
-    y_train = np_utils.to_categorical(y_train, 10)
-    y_test = np_utils.to_categorical(y_test, 10)
-    tsne = TSNE(n_components=2, init='pca', perplexity=30, verbose=2)
-    X_train = tsne.fit_transform(x_train[0:10000])
-    Y_train = y_train[:10000]
-    convex_hulls = convexHulls(X_train, Y_train)
-    ellipses = best_ellipses(X_train, Y_train)
-    Neighboring_hit = neighboring_hit(X_train, Y_train)
-    visualization(X_train, Y_train, convex_hulls, ellipses, 'tsne',
-                  Neighboring_hit)
+    X_train, y_train, X_test, y_test = loader()
+    tsne = TSNE(init="pca", n_components=2, perplexity=30, verbose=2)
+    X_train_Transformed = tsne.fit_transform(X_train)
+    convex_hulls = convexHulls(X_train_Transformed, y_train)
+    ellipses = best_ellipses(X_train_Transformed, y_train)
+    Neighboring_hits = neighboring_hit(X_train_Transformed, y_train)
+    visualization(X_train_Transformed, y_train, convex_hulls, ellipses,
+                  "TSNE", Neighboring_hits)
     modelACP = PCA(n_components=2)
-    acp = modelACP.fit_transform(x_train[:10000])
-    convex_hulls = convexHulls(acp,  Y_train)
-    ellipses = best_ellipses(acp,  Y_train)
-    nh = neighboring_hit(acp,  Y_train)
-    visualization(acp,  Y_train, convex_hulls, ellipses, "Number", nh)
+    acp = modelACP.fit_transform(X_train)
+    convex_hulls = convexHulls(acp, y_train)
+    ellipses = best_ellipses(acp, y_train)
+    Neighboring_hits = neighboring_hit(acp, y_train)
+    visualization(acp, y_train, convex_hulls, ellipses, "ACP",
+                  Neighboring_hits)
 
 
 if __name__ == '__main__':

@@ -59,7 +59,9 @@ def main():
         test[0, SEQLEN - 1, next_ind] = 1
     print("Generated text: " + gen_char)
 
+
 if __name__ == '__main__':
     start_time = time.time()
     main()
     print("-------% " + str(time.time() - start_time) + " secondes %-------")
+

@@ -5,6 +5,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+from keras.optimizers import sgd, SGD
+from keras.utils import np_utils
 from scipy.spatial import ConvexHull
 from sklearn.mixture import GaussianMixture
 from scipy import linalg
@@ -15,7 +17,6 @@ from keras.models import model_from_yaml
 
 
 def loader():
-    # the data, shuffled and split between train and test sets
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
     X_train = X_train.reshape(60000, 784)
     X_test = X_test.reshape(10000, 784)
@@ -130,21 +131,56 @@ def visualization(points2D, labels, convex_hulls, ellipses, projname, nh):
 
 
 def main():
+    # Let's use a MLP :
     # loading model generated earlier
     model = loadModel("ex2model")
+    learning_rate = 1.0
+    sgd = SGD(learning_rate)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd,
+                  metrics=['accuracy'])
+    model.summary()
     # Loading datas from Mnist
-    x_train, y_train, x_test, y_test = loader()
+    X_train, y_train, X_test, y_test = loader()
+    Y_test = np_utils.to_categorical(y_test, 10)
+    print("Perfs of MLP on test set = " + str(model.evaluate(X_test, Y_test)))
     # Removing top 2 layers
     model.pop()
     model.pop()
-    # predictions are the vectors from hidden layer
-    predictions = model.predict(x_test)
+    model.summary()
+    # applying TSNE on the vectors from hidden layer
     tsne = TSNE(n_components=2, perplexity=30.0, init='pca', verbose=2)
-    X_test = tsne.fit_transform(x_test)
-    hulls = convexHulls(X_test, predictions)
-    ellipses = best_ellipses(X_test, predictions)
-    nh = neighboring_hit(X_test, predictions)
-    visualization(X_test, predictions, hulls, ellipses, "Number", nh)
+    internal_state = tsne.fit_transform(model.predict(X_test))
+    hulls = convexHulls(internal_state, y_test)
+    ellipses = best_ellipses(internal_state, y_test)
+    neighboring_hits = neighboring_hit(internal_state, y_test)
+    visualization(internal_state, y_test, hulls, ellipses, "MLP", neighboring_hits)
+    # Let's do the same with a CNN :
+    # Loading new model
+    model = loadModel("ex3model")
+    model.compile(loss='categorical_crossentropy', optimizer=sgd,
+                  metrics=['accuracy'])
+    model.summary()
+    # Just to make sure (in theory it's useless to redo it)
+    # Loading datas from Mnist
+    X_train, y_train, X_test, y_test = loader()
+    X_test = X_test.reshape(X_test.shape[0], 28, 28, 1)
+    Y_test = np_utils.to_categorical(y_test, 10)
+    print("Perfs of CNN on test set = " + str(model.evaluate(X_test, Y_test)))
+    # Same as before
+    # Removing top 4 layers to view the last flatten layer.
+    model.pop()
+    model.pop()
+    model.pop()
+    model.pop()
+    model.summary()
+    internal = model.predict(X_test)
+    # applying TSNE on the vectors from hidden layer
+    tsne = TSNE(n_components=2, perplexity=30.0, init='pca', verbose=2)
+    internal_state = tsne.fit_transform(internal)
+    hulls = convexHulls(internal_state, y_test)
+    ellipses = best_ellipses(internal_state, y_test)
+    neighboring_hits = neighboring_hit(internal_state, y_test)
+    visualization(internal_state, y_test, hulls, ellipses, "CNN", neighboring_hits)
 
 
 if __name__ == '__main__':
